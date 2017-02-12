@@ -1,13 +1,9 @@
 class SBS():
-    from sklearn.base import clone
-    from itertools import combinations
-    import numpy as np
     from sklearn.metrics import accuracy_score
-    from sklearn.cross_validation import train_test_split
-
 
     def __init__(self, estimator, k_features, scoring=accuracy_score,
                  test_size=0.25, random_state=1):
+        from sklearn.base import clone
         self.scoring = scoring
         self.estimator = clone(estimator)
         self.k_features = k_features
@@ -15,13 +11,16 @@ class SBS():
         self.random_state = random_state
 
     def fit(self, X, y):
+        from itertools import combinations
+        import numpy as np
+        from sklearn.cross_validation import train_test_split
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=self.test_size,
                              random_state=self.random_state)
 
         dim = X_train.shape[1]
         #inital prediction
-        self.indices_ = tuple(range(dim))
+        self.indices_ = list(range(dim))
         self.subsets_ = [self.indices_]
         score = self._calc_score(X_train, y_train,
                                  X_test, y_test, self.indices_)
@@ -34,7 +33,7 @@ class SBS():
 
             for c in combinations(self.indices_, r = dim - 1):
                 score = self._calc_score(X_train, y_train,
-                                         X_test, y_test, c)
+                                         X_test, y_test, list(c))
                 scores.append(score)
                 subsets.append(c)
 
